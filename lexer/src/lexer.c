@@ -3,9 +3,7 @@
 #include <ctype.h>
 #include "lexer.h"
 
-Token* lexer_next_token(const char** regex, 
-                        struct Arena* arena) 
-{
+Token* lexer_next_token(const char** regex, struct Arena* arena) {
     if (regex == NULL || *regex == NULL || arena == NULL) {
         return NULL;
     }
@@ -13,6 +11,7 @@ Token* lexer_next_token(const char** regex,
     while (isspace(**regex)) {
         (*regex)++;
     }
+
     Token* token = (Token*)arena_alloc(arena, sizeof(Token));
     if (!token) {
         return NULL;
@@ -23,43 +22,40 @@ Token* lexer_next_token(const char** regex,
         token->type = T_EOF;
         token->value = c;
         return token;
-    }else if (isalnum(c)) {
-        token->type = T_CHAR;
-        token->value = c;
-        (*regex)++;
-    }else if (c == '+') {
-        token->type = T_PlUS;
-        token->value = c;
-        (*regex)++;
-    } else if (c == '?') {
-        token->type = T_QUESTION;
-        token->value = c;
-        (*regex)++;
-    } else if (c == '|') {
-        token->type = T_OR;
-        token->value = c;
-        (*regex)++;
-    } else if (c == '(') {
-        token->type = T_LPAREN;
-        token->value = c;
-        (*regex)++;
-    } else if (c == ')') {
-        token->type = T_RPAREN;
-        token->value = c;
-        (*regex)++;
-    } else if (c == '.') {
-        token->type = T_DOT;
-        token->value = c;
-        (*regex)++;
-
-    }else if (c == '*') {
-        token->type = T_STAR;
-        token->value = '*';
-        (*regex)++;
-    } else{
-        token->type = T_INVALID;
-        token->value = c;
-        (*regex)++; // 消费无效字符以避免无限循环
     }
+
+    switch (c) {
+        case '+':
+            token->type = T_PLUS;
+            break;
+        case '?':
+            token->type = T_QUESTION;
+            break;
+        case '|':
+            token->type = T_OR;
+            break;
+        case '(':
+            token->type = T_LPAREN;
+            break;
+        case ')':
+            token->type = T_RPAREN;
+            break;
+        case '.':
+            token->type = T_DOT;
+            break;
+        case '*':
+            token->type = T_STAR;
+            break;
+        default:
+            if (isalnum(c)) {
+                token->type = T_CHAR;
+            } else {
+                token->type = T_INVALID;
+            }
+            break;
+    }
+
+    token->value = c;
+    (*regex)++; // consume current character
     return token;
 }

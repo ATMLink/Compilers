@@ -8,7 +8,7 @@ typedef enum {
     T_CHAR,
     T_STAR,
     T_EOF,
-    T_PlUS,
+    T_PLUS,
     T_QUESTION,
     T_OR,
     T_LPAREN,
