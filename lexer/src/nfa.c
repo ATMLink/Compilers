@@ -1,20 +1,20 @@
-// src/nfa.c
+// nfa.c
 #include "nfa.h"
 #include <stdlib.h>
 
 State* create_state(struct Arena* arena) {
-    State* state = (State*)arena_alloc(arena, sizeof(state));
-    state -> is_accepting = 0;
-    state -> transitions = NULL;
-    return state;
+    State* s = (State*)arena_alloc(arena, sizeof(State));
+    s->is_accepting = 0;
+    s->transitions = NULL;
+    return s;
 }
 
-void add_transition(struct Arena* arena, State* from, char symbol, State* to){
-    Transition* transition = (Transition*)arena_alloc(arena, sizeof(Transition));
-    transition -> symbol = symbol;
-    transition -> target = to;
-    transition -> next = from -> transitions;
-    from -> transitions = transition;
+void add_transition(struct Arena* arena, State* from, char symbol, State* to) {
+    Transition* t = (Transition*)arena_alloc(arena, sizeof(Transition));
+    t->symbol = symbol;
+    t->target = to;
+    t->next = from->transitions;
+    from->transitions = t;
 }
 
 NFA create_char_nfa(struct Arena* arena, char c) {

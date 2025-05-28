@@ -1,4 +1,4 @@
-// src/nfa.h
+// nfa.h
 #ifndef NFA_H
 #define NFA_H
 
@@ -8,7 +8,7 @@ typedef struct State State;
 typedef struct Transition Transition;
 
 struct Transition {
-    char symbol;
+    char symbol; // '\0' for epsilon
     State* target;
     Transition* next;
 };
