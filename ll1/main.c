@@ -19,36 +19,53 @@
 #include "src/follow_set.h"
 #include "src/follow_set.c"
 
-int main(){
-    struct Arena* arena = arena_create(1024*10);
-    char filename[] = "grammar.txt";
+#include "src/TAC_generator.h"
+#include "src/TAC_generator.c"
+#include "src/asm_generator.h"
+#include "src/asm_generator.c"
+#include "src/reg_allocator.h"
+#include "src/reg_allocator.c"
+#include "src/ast.h"
+#include "src/ast.c"
+#include "src/semantic.h"
+#include "src/semantic.c"
 
-    GrammarResultGrammar result =  read_grammar(filename, arena);
+int main() {
+    // 读取文法
+    Arena* arena = arena_create(1024 * 10);
+    GrammarResultGrammar result = read_grammar("grammar.txt", arena);
     if (result.status != GRAMMAR_OK) {
-        fprintf(stderr, "Error: Failed to read grammar from file. Status code: %d\n", result.status);
-        arena_free(arena);
+        fprintf(stderr, "Error reading grammar\n");
         return 1;
     }
-
     Grammar* grammar = result.value;
-    print_grammar(grammar);
 
+    // 计算 FIRST/FOLLOW
     SymbolSet* sets = arena_alloc(arena, GRAMMAR_MAX_SYMBOLS * sizeof(SymbolSet));
-    if(!sets){
-        fprintf(stderr, "Error: Failed to allocate memory for sets of symbolset.\n");
-        return 1; 
-    }
     int set_count = 0;
-    printf("---非终结符的First集---\n");
     compute_first_sets(grammar, sets, &set_count, arena);
-    for(int i = 0; i < set_count; i++){
-        printf("First set[%c] : %s\n", sets[i].symbol, sets[i].first);
-    }
-    printf("---非终结符的Follow集---\n");
     compute_follow_sets(grammar, sets, &set_count, arena);
-    for(int i = 0; i < set_count; i++){
-        printf("Follow set[%c] : %s\n", sets[i].symbol, sets[i].follow);
-    }
+
+    // 构造表达式 AST（暂时手写）
+    ASTNode* node = create_binary_node('+',
+        create_identifier_node("a"),
+        create_binary_node('*',
+            create_identifier_node("b"),
+            create_identifier_node("c")));
+
+    printf("\n--- AST ---\n");
+    print_ast(node, 0);
+
+    // 生成 TAC
+    init_TAC();
+    char result_name[32];
+    generate_tac_from_ast(node, result_name);
+    printf("\n--- TAC ---\n");
+    print_TAC();
+
+    // 输出汇编
+    printf("\n--- ASM ---\n");
+    gen_asm();
 
     arena_free(arena);
     return 0;

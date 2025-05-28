@@ -1,4 +1,4 @@
-// semantic_stack.h
+// tac_generator.h
 #include "tac_generator.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,16 +6,15 @@
 
 #define MAX_TAC 1000
 
-typedef struct {
-    char op[10];
-    char arg1[50];
-    char arg2[50];
-    char result[50];
-} TAC;
 
 TAC tacs[MAX_TAC];
 int tac_count = 0;
 static int temp_count = 0;
+
+void init_TAC() {
+    tac_count = 0;
+    temp_count = 0;
+}
 
 void gen_TAC(const char* op, const char* arg1, const char* arg2, const char* result) {
     if (tac_count >= MAX_TAC) return;

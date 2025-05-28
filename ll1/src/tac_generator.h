@@ -11,10 +11,12 @@ typedef struct {
 
 extern TAC tacs[];
 extern int tac_count;
+// extern int temp_count;
 
 void gen_TAC(const char* op, const char* arg1, const char* arg2, const char* result);
 void print_TAC();
 char* new_temp();
 void optimize_TAC();
+void init_TAC();
 
 #endif
