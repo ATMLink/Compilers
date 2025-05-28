@@ -1,0 +1,33 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/chengzhenbo/Documents/c_programing/compiler/ll1/test/test_grammar'
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _arena_create, symObjAddr: 0x0, symBinAddr: 0x1000012D8, symSize: 0xD0 }
+  - { offsetInCU: 0x65, offset: 0x65, size: 0x8, addend: 0x0, symName: _failed, symObjAddr: 0x6184, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0x128, offset: 0x128, size: 0x8, addend: 0x0, symName: _arena_create, symObjAddr: 0x0, symBinAddr: 0x1000012D8, symSize: 0xD0 }
+  - { offsetInCU: 0x15E, offset: 0x15E, size: 0x8, addend: 0x0, symName: _arena_alloc, symObjAddr: 0xD0, symBinAddr: 0x1000013A8, symSize: 0xF0 }
+  - { offsetInCU: 0x1A2, offset: 0x1A2, size: 0x8, addend: 0x0, symName: _arena_free, symObjAddr: 0x1C0, symBinAddr: 0x100001498, symSize: 0x48 }
+  - { offsetInCU: 0x1C6, offset: 0x1C6, size: 0x8, addend: 0x0, symName: _print_grammar, symObjAddr: 0x208, symBinAddr: 0x1000014E0, symSize: 0x1B4 }
+  - { offsetInCU: 0x25A, offset: 0x25A, size: 0x8, addend: 0x0, symName: _grammar_is_terminal, symObjAddr: 0x3BC, symBinAddr: 0x100001694, symSize: 0x5C }
+  - { offsetInCU: 0x282, offset: 0x282, size: 0x8, addend: 0x0, symName: _grammar_is_nonterminal, symObjAddr: 0x418, symBinAddr: 0x1000016F0, symSize: 0x30 }
+  - { offsetInCU: 0x2AA, offset: 0x2AA, size: 0x8, addend: 0x0, symName: _read_grammar, symObjAddr: 0x448, symBinAddr: 0x100001720, symSize: 0x194 }
+  - { offsetInCU: 0x337, offset: 0x337, size: 0x8, addend: 0x0, symName: _init_grammar, symObjAddr: 0x5DC, symBinAddr: 0x1000018B4, symSize: 0x100 }
+  - { offsetInCU: 0x37B, offset: 0x37B, size: 0x8, addend: 0x0, symName: _grammar_report_error, symObjAddr: 0x6DC, symBinAddr: 0x1000019B4, symSize: 0x6C }
+  - { offsetInCU: 0x3AE, offset: 0x3AE, size: 0x8, addend: 0x0, symName: _grammar_process_line, symObjAddr: 0x748, symBinAddr: 0x100001A20, symSize: 0x158 }
+  - { offsetInCU: 0x42A, offset: 0x42A, size: 0x8, addend: 0x0, symName: _test_is_terminal_nonterminal, symObjAddr: 0x8A0, symBinAddr: 0x100001B78, symSize: 0x1E4 }
+  - { offsetInCU: 0x43F, offset: 0x43F, size: 0x8, addend: 0x0, symName: _test_add_unique_symbol, symObjAddr: 0xA84, symBinAddr: 0x100001D5C, symSize: 0x2E0 }
+  - { offsetInCU: 0x49B, offset: 0x49B, size: 0x8, addend: 0x0, symName: _grammar_add_unique_symbol, symObjAddr: 0xD64, symBinAddr: 0x10000203C, symSize: 0x124 }
+  - { offsetInCU: 0x4FB, offset: 0x4FB, size: 0x8, addend: 0x0, symName: _test_remove_spaces, symObjAddr: 0xE88, symBinAddr: 0x100002160, symSize: 0xEC }
+  - { offsetInCU: 0x51F, offset: 0x51F, size: 0x8, addend: 0x0, symName: _line_remove_spaces, symObjAddr: 0xF74, symBinAddr: 0x10000224C, symSize: 0x9C }
+  - { offsetInCU: 0x56D, offset: 0x56D, size: 0x8, addend: 0x0, symName: _test_extract_lhs, symObjAddr: 0x1010, symBinAddr: 0x1000022E8, symSize: 0x250 }
+  - { offsetInCU: 0x591, offset: 0x591, size: 0x8, addend: 0x0, symName: _grammar_extract_lhs, symObjAddr: 0x1260, symBinAddr: 0x100002538, symSize: 0x104 }
+  - { offsetInCU: 0x5E3, offset: 0x5E3, size: 0x8, addend: 0x0, symName: _test_extract_rhs, symObjAddr: 0x1364, symBinAddr: 0x10000263C, symSize: 0x27C }
+  - { offsetInCU: 0x607, offset: 0x607, size: 0x8, addend: 0x0, symName: _grammar_extract_rhs, symObjAddr: 0x15E0, symBinAddr: 0x1000028B8, symSize: 0xF4 }
+  - { offsetInCU: 0x63D, offset: 0x63D, size: 0x8, addend: 0x0, symName: _test_collect_rhs_symbols, symObjAddr: 0x16D4, symBinAddr: 0x1000029AC, symSize: 0x1E0 }
+  - { offsetInCU: 0x68B, offset: 0x68B, size: 0x8, addend: 0x0, symName: _grammar_collect_rhs_symbols, symObjAddr: 0x18B4, symBinAddr: 0x100002B8C, symSize: 0x174 }
+  - { offsetInCU: 0x6F9, offset: 0x6F9, size: 0x8, addend: 0x0, symName: _test_parse_rhs, symObjAddr: 0x1A28, symBinAddr: 0x100002D00, symSize: 0x328 }
+  - { offsetInCU: 0x755, offset: 0x755, size: 0x8, addend: 0x0, symName: _grammar_parse_rhs, symObjAddr: 0x1D50, symBinAddr: 0x100003028, symSize: 0x284 }
+  - { offsetInCU: 0x809, offset: 0x809, size: 0x8, addend: 0x0, symName: _test_process_line, symObjAddr: 0x1FD4, symBinAddr: 0x1000032AC, symSize: 0x1C8 }
+  - { offsetInCU: 0x865, offset: 0x865, size: 0x8, addend: 0x0, symName: _test_read_grammar, symObjAddr: 0x219C, symBinAddr: 0x100003474, symSize: 0x340 }
+  - { offsetInCU: 0x8B3, offset: 0x8B3, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x24DC, symBinAddr: 0x1000037B4, symSize: 0x128 }
+...
