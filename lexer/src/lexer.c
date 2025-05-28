@@ -27,7 +27,32 @@ Token* lexer_next_token(const char** regex,
         token->type = T_CHAR;
         token->value = c;
         (*regex)++;
-    } else if (c == '*') {
+    }else if (c == '+') {
+        token->type = T_PlUS;
+        token->value = c;
+        (*regex)++;
+    } else if (c == '?') {
+        token->type = T_QUESTION;
+        token->value = c;
+        (*regex)++;
+    } else if (c == '|') {
+        token->type = T_OR;
+        token->value = c;
+        (*regex)++;
+    } else if (c == '(') {
+        token->type = T_LPAREN;
+        token->value = c;
+        (*regex)++;
+    } else if (c == ')') {
+        token->type = T_RPAREN;
+        token->value = c;
+        (*regex)++;
+    } else if (c == '.') {
+        token->type = T_DOT;
+        token->value = c;
+        (*regex)++;
+
+    }else if (c == '*') {
         token->type = T_STAR;
         token->value = '*';
         (*regex)++;

@@ -28,5 +28,8 @@ void add_transition(struct Arena* arena, State* from, char symbol, State* to);
 NFA create_char_nfa(struct Arena* arena, char c);
 NFA create_concat_nfa(struct Arena* arena, NFA a, NFA b);
 NFA create_star_nfa(struct Arena* arena, NFA inner);
+NFA create_or_nfa(struct Arena* arena, NFA a, NFA b);
+NFA create_dot_nfa(struct Arena* arena);
+NFA create_plus_nfa(struct Arena* arena, NFA inner);
 
 #endif

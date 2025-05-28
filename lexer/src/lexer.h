@@ -8,6 +8,12 @@ typedef enum {
     T_CHAR,
     T_STAR,
     T_EOF,
+    T_PlUS,
+    T_QUESTION,
+    T_OR,
+    T_LPAREN,
+    T_RPAREN,
+    T_DOT,
     T_INVALID //表示无效或无法识别的字符
 } TokenType;
 

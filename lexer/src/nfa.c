@@ -42,3 +42,66 @@ NFA create_star_nfa(struct Arena* arena, NFA inner) {
     accept->is_accepting = 1;
     return (NFA){start, accept};
 }
+
+NFA create_or_nfa(struct Arena* arena, NFA a, NFA b) {
+    State* start = create_state(arena);
+    State* accept = create_state(arena);
+    add_transition(arena, start, '\0', a.start);
+    add_transition(arena, start, '\0', b.start);
+    add_transition(arena, a.accept, '\0', accept);
+    add_transition(arena, b.accept, '\0', accept);
+    a.accept->is_accepting = 0;
+    b.accept->is_accepting = 0;
+    accept->is_accepting = 1;
+    return (NFA){start, accept};
+}
+
+NFA create_dot_nfa(struct Arena* arena) {
+    State* start = create_state(arena);
+    State* accept = create_state(arena);
+    for (char c = 0; c < 256; c++) {
+        if (c != '\0') { // 忽略空字符
+            add_transition(arena, start, c, accept);
+        }
+    }
+    accept->is_accepting = 1;
+    return (NFA){start, accept};
+}
+
+NFA create_plus_nfa(struct Arena* arena, NFA inner) {
+    State* start = create_state(arena);
+    State* accept = create_state(arena);
+    add_transition(arena, start, '\0', inner.start);
+    add_transition(arena, inner.accept, '\0', inner.start);
+    add_transition(arena, inner.accept, '\0', accept);
+    inner.accept->is_accepting = 0;
+    accept->is_accepting = 1;
+    return (NFA){start, accept};
+}
+
+NFA create_question_nfa(struct Arena* arena, NFA inner) {
+    State* start = create_state(arena);
+    State* accept = create_state(arena);
+    add_transition(arena, start, '\0', inner.start);
+    add_transition(arena, start, '\0', accept);
+    add_transition(arena, inner.accept, '\0', accept);
+    inner.accept->is_accepting = 0;
+    accept->is_accepting = 1;
+    return (NFA){start, accept};
+}
+
+NFA create_left_paren_nfa(struct Arena* arena) {
+    State* start = create_state(arena);
+    State* accept = create_state(arena);
+    add_transition(arena, start, '\0', accept);
+    accept->is_accepting = 1;
+    return (NFA){start, accept};
+}
+
+NFA create_right_paren_nfa(struct Arena* arena) {
+    State* start = create_state(arena);
+    State* accept = create_state(arena);
+    add_transition(arena, start, '\0', accept);
+    accept->is_accepting = 1;
+    return (NFA){start, accept};
+}
