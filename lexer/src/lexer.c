@@ -12,7 +12,7 @@ Token* lexer_next_token(const char** regex,
     }
 
     // 跳过空白字符
-    while(isSpace(**regex)){
+    while(isspace(**regex)){
         (*regex)++;
     }
 

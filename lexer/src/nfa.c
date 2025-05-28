@@ -1,3 +1,4 @@
+// src/nfa.c
 #include "nfa.h"
 #include <stdlib.h>
 
@@ -14,4 +15,30 @@ void add_transition(struct Arena* arena, State* from, char symbol, State* to){
     transition -> target = to;
     transition -> next = from -> transitions;
     from -> transitions = transition;
+}
+
+NFA create_char_nfa(struct Arena* arena, char c) {
+    State* start = create_state(arena);
+    State* accept = create_state(arena);
+    add_transition(arena, start, c, accept);
+    accept->is_accepting = 1;
+    return (NFA){start, accept};
+}
+
+NFA create_concat_nfa(struct Arena* arena, NFA a, NFA b) {
+    add_transition(arena, a.accept, '\0', b.start);
+    a.accept->is_accepting = 0;
+    return (NFA){a.start, b.accept};
+}
+
+NFA create_star_nfa(struct Arena* arena, NFA inner) {
+    State* start = create_state(arena);
+    State* accept = create_state(arena);
+    add_transition(arena, start, '\0', inner.start);
+    add_transition(arena, start, '\0', accept);
+    add_transition(arena, inner.accept, '\0', inner.start);
+    add_transition(arena, inner.accept, '\0', accept);
+    inner.accept->is_accepting = 0;
+    accept->is_accepting = 1;
+    return (NFA){start, accept};
 }
