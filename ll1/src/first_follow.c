@@ -3,6 +3,7 @@
 
 #include <ctype.h>
 #include <string.h>
+#include <stdio.h>
 
 SymbolSet* get_or_create_set(SymbolSet* sets, 
                              int* count, 
