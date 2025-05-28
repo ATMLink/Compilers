@@ -31,7 +31,7 @@ int simulate_nfa(State* start, const char* input, struct Arena* arena) {
         StateList* next = NULL;
         for (StateList* node = current; node; node = node->next) {
             for (Transition* t = node->state->transitions; t; t = t->next) {
-                if (t->symbol == *p) {
+                if (t->symbol == *p || t->symbol == ANY_CHAR) {
                     epsilon_closure(arena, &next, t->target);
                 }
             }

@@ -1,16 +1,26 @@
 // nfa.c
 #include "nfa.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 State* create_state(struct Arena* arena) {
     State* s = (State*)arena_alloc(arena, sizeof(State));
+    if (!s) {
+        fprintf(stderr, "Failed to allocate state\n");
+        return NULL;
+    }
     s->is_accepting = 0;
     s->transitions = NULL;
     return s;
 }
 
 void add_transition(struct Arena* arena, State* from, char symbol, State* to) {
+    if (!from || !to) return;
     Transition* t = (Transition*)arena_alloc(arena, sizeof(Transition));
+    if (!t) {
+        fprintf(stderr, "Failed to allocate transition\n");
+        return;
+    }
     t->symbol = symbol;
     t->target = to;
     t->next = from->transitions;
@@ -20,7 +30,9 @@ void add_transition(struct Arena* arena, State* from, char symbol, State* to) {
 NFA create_char_nfa(struct Arena* arena, char c) {
     State* start = create_state(arena);
     State* accept = create_state(arena);
+    if (!start || !accept) return (NFA){NULL, NULL};
     add_transition(arena, start, c, accept);
+    if (!start->transitions) return (NFA){NULL, NULL};
     accept->is_accepting = 1;
     return (NFA){start, accept};
 }
@@ -56,17 +68,23 @@ NFA create_or_nfa(struct Arena* arena, NFA a, NFA b) {
     return (NFA){start, accept};
 }
 
+// NFA create_dot_nfa(struct Arena* arena) {
+//     State* start = create_state(arena);
+//     State* accept = create_state(arena);
+//     if (!start || !accept) return (NFA){NULL, NULL};
+//     add_transition(arena, start, '.', accept);
+//     if (!start->transitions) return (NFA){NULL, NULL};
+//     accept->is_accepting = 1;
+//     return (NFA){start, accept};
+// }
 NFA create_dot_nfa(struct Arena* arena) {
     State* start = create_state(arena);
     State* accept = create_state(arena);
-    for (char c = 0; c < 256; c++) {
-        if (c != '\0') { // 忽略空字符
-            add_transition(arena, start, c, accept);
-        }
-    }
+    add_transition(arena, start, ANY_CHAR, accept);
     accept->is_accepting = 1;
     return (NFA){start, accept};
 }
+
 
 NFA create_plus_nfa(struct Arena* arena, NFA inner) {
     State* start = create_state(arena);

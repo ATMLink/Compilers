@@ -2,6 +2,8 @@
 #ifndef NFA_H
 #define NFA_H
 
+#define ANY_CHAR -1 // 用于表示任意字符的转移
+
 #include "arena.h"
 
 typedef struct State State;

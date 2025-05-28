@@ -13,11 +13,20 @@ int get_state_id(State* state, State** id_map, int* next_id) {
         if (id_map[i] == state) return i;
     }
     if (*next_id >= MAX_STATES) return -1;
-    id_map[*next_id] = state;
-    return (*next_id)++;
+    int id = *next_id;
+    id_map[id] = state;
+    (*next_id)++;
+    return id;
 }
-// 打印 NFA 状态
+
+
+// 递归打印NFA状态及其转移
 void print_state(State* state, int* visited, State** id_map, int* next_id) {
+    // if(depth > 100){
+    //     printf("max depth reached \n");
+    //     return;
+    // }
+
     int id = get_state_id(state, id_map, next_id);
     if (id == -1 || visited[id]) return;
     visited[id] = 1;
@@ -31,35 +40,67 @@ void print_state(State* state, int* visited, State** id_map, int* next_id) {
     }
 
     for (Transition* t = state->transitions; t != NULL; t = t->next) {
+        // printf("Entering State[%d]\n", id);
         print_state(t->target, visited, id_map, next_id);
     }
 }
 
+// 简单封装打印NFA结构
+void test_print_nfa(NFA nfa, const char* desc) {
+    printf("NFA for %s:\n", desc);
+    int visited[MAX_STATES] = {0};
+    State* id_map[MAX_STATES] = {0};
+    int next_id = 0;
+    print_state(nfa.start, visited, id_map, &next_id);
+    printf("\n");
+}
+
 int main() {
     struct Arena* arena = arena_create(2048);
+    if (!arena) {
+        fprintf(stderr, "Failed to create arena\n");
+        return 1;
+    }
 
-    // 第一个测试：a*
-    printf("NFA for a*:\n");
-    NFA nfa1 = create_star_nfa(arena, create_char_nfa(arena, 'a'));
-    int visited1[MAX_STATES] = {0};
-    State* id_map1[MAX_STATES] = {0};
-    int next_id1 = 0;
-    print_state(nfa1.start, visited1, id_map1, &next_id1);
+    // 1. a
+    test_print_nfa(create_char_nfa(arena, 'a'), "\"a\"");
 
-    printf("\n");
+    // 2. a*
+    test_print_nfa(create_star_nfa(arena, create_char_nfa(arena, 'a')), "\"a*\"");
 
-    // 第二个测试：ab*
-    // 即构建 a + b* 的连接
-    printf("NFA for ab*:\n");
-    NFA a = create_char_nfa(arena, 'a');
-    NFA b = create_char_nfa(arena, 'b');
-    NFA b_star = create_star_nfa(arena, b);
-    NFA ab_star = create_concat_nfa(arena, a, b_star);
+    // 3. ab (concat)
+    {
+        NFA a = create_char_nfa(arena, 'a');
+        NFA b = create_char_nfa(arena, 'b');
+        NFA ab = create_concat_nfa(arena, a, b);
+        test_print_nfa(ab, "\"ab\"");
+    }
 
-    int visited2[MAX_STATES] = {0};
-    State* id_map2[MAX_STATES] = {0};
-    int next_id2 = 0;
-    print_state(ab_star.start, visited2, id_map2, &next_id2);
+    // 4. a|b (or)
+    {
+        NFA a = create_char_nfa(arena, 'a');
+        NFA b = create_char_nfa(arena, 'b');
+        NFA a_or_b = create_or_nfa(arena, a, b);
+        test_print_nfa(a_or_b, "\"a|b\"");
+    }
+
+    // 5. a+ (one or more)
+    test_print_nfa(create_plus_nfa(arena, create_char_nfa(arena, 'a')), "\"a+\"");
+
+    // 6. a? (zero or one)
+    test_print_nfa(create_question_nfa(arena, create_char_nfa(arena, 'a')), "\"a?\"");
+
+    // 7. (ab)* (star with grouping)
+    {
+        NFA a = create_char_nfa(arena, 'a');
+        NFA b = create_char_nfa(arena, 'b');
+        NFA ab = create_concat_nfa(arena, a, b);
+        NFA ab_star = create_star_nfa(arena, ab);
+        test_print_nfa(ab_star, "\"(ab)*\"");
+    }
+
+    // 8. dot (any character)
+    test_print_nfa(create_dot_nfa(arena), "\".\"");
 
     arena_free(arena);
     return 0;

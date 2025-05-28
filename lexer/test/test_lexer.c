@@ -55,6 +55,8 @@ void test_lexer(const char* regex) {
                 printf("  Token: T_LPAREN   '('\n"); break;
             case T_RPAREN:
                 printf("  Token: T_RPAREN   ')'\n"); break;
+            case T_DOT:
+                printf("  Token: T_DOT      '.'\n"); break;
             case T_INVALID:
                 printf("  Token: T_INVALID  '%c'\n", token->value); break;
             default:
@@ -71,11 +73,12 @@ int main() {
     test_lexer("a");
     test_lexer("a*");
     test_lexer("ab");
+    test_lexer("a.b");
     test_lexer("a+b");
     test_lexer("a?b");
     test_lexer("a|b");
     test_lexer("(ab)*");
-    test_lexer("a(b|c)*d+e?f");
+    test_lexer("a(b|c)*d+e?f.g");
 
     return 0;
 }

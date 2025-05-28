@@ -1,5 +1,6 @@
 #ifndef MATCHER_H
 #define MATCHER_H
+#define ANY_CHAR -1
 
 #include "nfa.h"
 
