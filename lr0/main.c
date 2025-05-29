@@ -13,6 +13,9 @@
 #include "src/viable_prefix_dfa.h"
 #include "src/viable_prefix_dfa.c"
 
+#include "src/lr0_parse_table.h"
+#include "src/lr0_parse_table.c"
+
 int main(){
     Arena* grammar_arena = arena_create(1024*1024);
     Arena* dfa_arena = arena_create(1024 * 1024);
@@ -24,32 +27,25 @@ int main(){
     }
 
     char filename[] = "grammar.txt";
-    // Grammar* grammar = read_grammar(filename, grammar_arena);
     GrammarResultGrammar result =  read_grammar(filename, grammar_arena);
     if (result.status != GRAMMAR_OK) {
         fprintf(stderr, "Error: Failed to read grammar from file. Status code: %d\n", result.status);
         arena_free(grammar_arena);
+        arena_free(dfa_arena);
         return 1;
     }
 
     Grammar* grammar = result.value;
     print_grammar(grammar);
-    // printf("---文法的非终结符---\n");
-    // for(int i = 0; i < grammar->nonterminals_count; i++){
-    //     printf("Nondermials[%d], %c\n", i, grammar->nonterminals[i]);
-    // }
-    // printf("---文法的终结符---\n");
-    // for(int i = 0; i < grammar->terminals_count; i++){
-    //     printf("Dermials[%d], %c\n", i, grammar->terminals[i]);
-    // }
-    // printf("---文法的产生式---\n");
-    // for (int i = 0; i < grammar->rule_count; i++) {
-    //     printf("Rule[%d]: %c -> %s\n", i, grammar->rules[i].left_hs, grammar->rules[i].right_hs);
-    // }
-    // 构建 DFA
+
     DFA dfa;
     build_viable_prefix_dfa(grammar, &dfa, dfa_arena);
     print_dfa(&dfa);
+
+    // 构建并打印 LR(0) 解析表
+    LR0ParseTable parse_table = {0};
+    build_lr0_parse_table(grammar, &dfa, &parse_table);
+    print_lr0_parse_table(grammar, &parse_table, &dfa, stdout);
 
     grammar_free(grammar);
     dfa_free(&dfa);
