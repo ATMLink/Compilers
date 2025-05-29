@@ -19,8 +19,8 @@
 #include "src/follow_set.h"
 #include "src/follow_set.c"
 
-#include "src/TAC_generator.h"
-#include "src/TAC_generator.c"
+#include "src/tac_generator.h"
+#include "src/tac_generator.c"
 #include "src/asm_generator.h"
 #include "src/asm_generator.c"
 #include "src/reg_allocator.h"
@@ -29,44 +29,138 @@
 #include "src/ast.c"
 #include "src/semantic.h"
 #include "src/semantic.c"
+#include "src/predict_table.h"
+#include "src/predict_table.c"
+#include "src/parser.h"
+#include "src/parser.c"
+#include "src/tree_node.h"
+#include "src/tree_node.c"
+#include "src/ast_builder.h"
+#include "src/ast_builder.c"
 
-int main() {
-    // 读取文法
-    Arena* arena = arena_create(1024 * 10);
-    GrammarResultGrammar result = read_grammar("grammar.txt", arena);
-    if (result.status != GRAMMAR_OK) {
-        fprintf(stderr, "Error reading grammar\n");
+
+// Simple lexer to convert input string to token array
+#define MAX_TOKENS 100
+const char** tokenize(const char* input, int* token_count) {
+    static const char* tokens[MAX_TOKENS];
+    *token_count = 0;
+    
+    for (const char* p = input; *p && *token_count < MAX_TOKENS; p++) {
+        if (isspace(*p)) continue; // Skip whitespace
+        if (*p == 'c' || *p == 'd' || *p == 'b') { // Valid terminals from grammar
+            char* token = malloc(2);
+            token[0] = *p;
+            token[1] = '\0';
+            tokens[(*token_count)++] = token;
+        } else {
+            fprintf(stderr, "Invalid character in input: %c\n", *p);
+            return NULL;
+        }
+    }
+    return tokens;
+}
+
+// Free token array
+void free_tokens(const char** tokens, int token_count) {
+    for (int i = 0; i < token_count; i++) {
+        free((char*)tokens[i]);
+    }
+}
+
+int main(int argc, char** argv) {
+    // Step 1: Initialize arena for memory management
+    Arena* arena = arena_create(1024 * 1024); // 1MB arena
+    if (!arena) {
+        fprintf(stderr, "Failed to create arena\n");
         return 1;
     }
-    Grammar* grammar = result.value;
 
-    // 计算 FIRST/FOLLOW
-    SymbolSet* sets = arena_alloc(arena, GRAMMAR_MAX_SYMBOLS * sizeof(SymbolSet));
+    // Step 2: Read grammar from file
+    GrammarResultGrammar grammar_res = read_grammar("grammar.txt", arena);
+    if (grammar_res.status != GRAMMAR_OK) {
+        fprintf(stderr, "Failed to read grammar\n");
+        arena_free(arena);
+        return 1;
+    }
+    Grammar* grammar = grammar_res.value;
+    grammar->start_symbol = 'A'; // Set start symbol
+    print_grammar(grammar);
+
+    // Step 3: Compute First and Follow sets
+    SymbolSet sets[GRAMMAR_MAX_SYMBOLS];
     int set_count = 0;
     compute_first_sets(grammar, sets, &set_count, arena);
     compute_follow_sets(grammar, sets, &set_count, arena);
 
-    // 构造表达式 AST（暂时手写）
-    ASTNode* node = create_binary_node('+',
-        create_identifier_node("a"),
-        create_binary_node('*',
-            create_identifier_node("b"),
-            create_identifier_node("c")));
+    // Print First and Follow sets for debugging
+    printf("\nFirst and Follow Sets:\n");
+    for (int i = 0; i < set_count; i++) {
+        printf("Symbol %c: First={%s}, Follow={%s}\n", 
+               sets[i].symbol, sets[i].first, sets[i].follow);
+    }
 
-    printf("\n--- AST ---\n");
-    print_ast(node, 0);
+    // Step 4: Compute predict table
+    PredictTable predict_table = {0};
+    compute_predict_table(grammar, sets, set_count, &predict_table);
+    print_predict_table(&predict_table);
 
-    // 生成 TAC
+    // Step 5: Tokenize input
+    const char* input = (argc > 1) ? argv[1] : "db"; // Default input: "db"
+    int token_count;
+    const char** tokens = tokenize(input, &token_count);
+    if (!tokens) {
+        fprintf(stderr, "Tokenization failed\n");
+        arena_free(arena);
+        return 1;
+    }
+    printf("\nTokens: ");
+    for (int i = 0; i < token_count; i++) {
+        printf("%s ", tokens[i]);
+    }
+    printf("\n");
+
+    // Step 6: Parse tokens and build CST
+    TreeNode* cst_root = NULL;
+    parse_tokens_with_tree(grammar, &predict_table, tokens, token_count, &cst_root);
+    if (!cst_root) {
+        fprintf(stderr, "Parsing failed\n");
+        free_tokens(tokens, token_count);
+        arena_free(arena);
+        return 1;
+    }
+    printf("\nConcrete Syntax Tree:\n");
+    print_tree(cst_root, 0);
+
+    // Step 7: Build AST from CST
+    ASTNode* ast_root = build_ast(cst_root);
+    if (!ast_root) {
+        fprintf(stderr, "AST construction failed\n");
+        free_tokens(tokens, token_count);
+        arena_free(arena);
+        return 1;
+    }
+    printf("\nAbstract Syntax Tree:\n");
+    print_ast(ast_root, 0);
+
+    // Step 8: Generate TAC from AST
     init_TAC();
     char result_name[32];
-    generate_tac_from_ast(node, result_name);
-    printf("\n--- TAC ---\n");
+    generate_tac_from_ast(ast_root, result_name);
+    printf("\nThree-Address Code:\n");
     print_TAC();
 
-    // 输出汇编
-    printf("\n--- ASM ---\n");
+    // Step 9: Optimize TAC
+    optimize_TAC();
+    printf("\nOptimized Three-Address Code:\n");
+    print_TAC();
+
+    // Step 10: Generate assembly code
+    printf("\nAssembly Code:\n");
     gen_asm();
 
+    // Cleanup
+    free_tokens(tokens, token_count);
     arena_free(arena);
+    // Note: AST and CST nodes are not freed as they use arena memory
     return 0;
 }
