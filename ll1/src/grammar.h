@@ -31,6 +31,8 @@ typedef struct Grammar
     uint8_t nonterminals_count;
     char terminals[GRAMMAR_MAX_SYMBOLS];
     uint8_t terminals_count;
+    char start_symbol; // 起始符号
+    
 } Grammar;
 
 // ==== 错误码 ====
