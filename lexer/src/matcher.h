@@ -4,6 +4,11 @@
 
 #include "nfa.h"
 
+typedef struct StateList {
+    State* state;
+    struct StateList* next;
+} StateList;
+
 int simulate_nfa(State* start, const char* input, struct Arena* arena);
 
 #endif
