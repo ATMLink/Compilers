@@ -1,3 +1,6 @@
+// asm_generator.c - 汇编代码生成器实现
+// 负责将中间代码（TAC）或语法树转换为汇编代码输出
+
 #include <stdio.h>
 #include <string.h>
 #include "tac_generator.h"

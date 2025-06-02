@@ -1,3 +1,7 @@
+// grammar.c - LL(1) 文法处理与语义动作支持实现
+// 包含文法的读取、符号收集、规则解析、SDT 语义动作提取等核心逻辑
+// 适用于 LL(1) 语法分析器的文法加载与分析
+
 #include "grammar.h"
 #include "first_follow.h"
 

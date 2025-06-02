@@ -18,3 +18,105 @@ B -> b
 windows下编译运行示例:
 gcc main.c -o main
 .\main
+
+; ll1/src 目录各模块说明
+
+1. Arena 分配相关
+
+arena_create
+    • 功能: 创建一个新的 Arena 结构体，分配指定大小的内存。
+    • 作用: 初始化一个新的 Arena（内存池），为后续分配内存准备。它返回一个指向 Arena 的指针。
+
+arena_alloc
+    • 功能: 从 Arena 中分配指定大小的内存。
+    • 作用: 在 Arena 内存池中按顺序分配内存，确保不会超出预定大小。如果分配成功，返回指向内存块的指针。
+
+arena_free
+    • 功能: 释放 Arena 内存池占用的内存。
+    • 作用: 在程序结束时，释放 Arena 所占用的内存空间，避免内存泄漏。
+
+2. 文法与 First/Follow 集相关
+
+grammar.h/grammar.c
+    • 功能: 解析上下文无关文法（支持空产生式），存储产生式规则、符号表等。
+    • 作用: 支持动态加载文法文件，提取产生式、非终结符、终结符，支持语义动作（SDT）嵌入。
+
+first_set.h/first_set.c
+    • 功能: 计算文法中每个符号的 First 集合。
+    • 作用: 用于 LL(1) 预测分析表的构建。
+
+follow_set.h/follow_set.c
+    • 功能: 计算文法中每个非终结符的 Follow 集合。
+    • 作用: 用于 LL(1) 预测分析表的构建。
+
+first_follow.h/first_follow.c
+    • 功能: 提供符号集结构体、查找/创建符号集、集合操作等基础接口。
+
+3. 预测分析表相关
+
+predict_table.h/predict_table.c
+    • 功能: 构建 LL(1) 预测分析表。
+    • 作用: 根据 First/Follow 集合和文法规则，生成预测分析表，驱动 LL(1) 语法分析。
+
+4. 语法分析与语法树
+
+parser.h/parser.c
+    • 功能: 基于预测分析表的 LL(1) 语法分析器。
+    • 作用: 对 token 流进行 LL(1) 语法分析，支持语法制导翻译（SDT），可构建具体语法树（CST）。
+
+tree_node.h/tree_node.c
+    • 功能: 具体语法树（CST）节点结构与操作。
+    • 作用: 记录语法分析过程中的树结构。
+
+ast_builder.h/ast_builder.c
+    • 功能: 抽象语法树（AST）构建。
+    • 作用: 从 CST 构建更简洁的 AST，便于后续代码生成。
+
+ast.h/ast.c
+    • 功能: AST 节点结构与遍历、打印等操作。
+
+5. 语义分析与中间代码
+
+semantic.h/semantic.c
+    • 功能: 语义分析，包括类型检查、作用域管理等。
+    • 作用: 检查 AST 的语义正确性。
+
+semantic_stack.h/semantic_stack.c
+    • 功能: 语义栈实现，支持 LL(1) 语法分析过程中的语义动作。
+
+tac_generator.h/tac_generator.c
+    • 功能: 三地址码（TAC）生成与打印。
+    • 作用: 从 AST 生成中间代码，支持基本优化。
+
+6. 汇编生成与寄存器分配
+
+asm_generator.h/asm_generator.c
+    • 功能: 汇编代码生成。
+    • 作用: 将 TAC 转换为汇编代码，支持简单的寄存器分配注释。
+
+reg_allocator.h/reg_allocator.c
+    • 功能: 简单寄存器分配器。
+    • 作用: 为 TAC/汇编分配物理寄存器。
+
+7. 主程序与测试
+
+main.c
+    • 功能: 程序主入口，驱动文法加载、First/Follow 计算、预测分析表构建、词法分析、LL(1) 语法分析、CST/AST/TAC/汇编生成等全流程。
+    • 作用: 负责整体流程控制，支持命令行输入、调试输出。
+
+test/
+    • 功能: 单元测试与集成测试。
+    • 作用: 验证各模块功能正确性。
+
+8. 使用说明
+
+准备文法文件 grammar.txt，格式示例：
+A -> DB
+A -> #
+D -> d
+D -> #
+B -> b
+
+Windows 下编译运行示例：
+gcc main.c -o main
+.\main

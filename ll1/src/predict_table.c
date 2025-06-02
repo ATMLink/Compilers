@@ -1,3 +1,6 @@
+// predict_table.c - 预测分析表实现
+// 负责 LL(1) 预测分析表的构建和查询
+
 #include "predict_table.h"
 #include <string.h>
 #include <stdio.h>
@@ -10,6 +13,7 @@ static SymbolSet* find_symbol_set(SymbolSet* sets, int count, char symbol) {
     return NULL;
 }
 
+// 为预测分析表添加一个条目
 static void add_predict_entry(PredictTable* table, char nonterminal, char terminal, Rule* rule) {
     // 防止冲突：一个 [非终结符, 终结符] 对应多个规则，说明不是 LL(1)
     for (int i = 0; i < table->entry_count; ++i) {
@@ -27,6 +31,7 @@ static void add_predict_entry(PredictTable* table, char nonterminal, char termin
     };
 }
 
+// 计算预测分析表
 void compute_predict_table(const Grammar* grammar,
                            SymbolSet* sets,
                            int set_count,
@@ -73,6 +78,7 @@ void compute_predict_table(const Grammar* grammar,
     }
 }
 
+// 查找预测分析表中的规则
 const Rule* lookup_predict(const PredictTable* table, char nonterminal, char terminal) {
     for (int i = 0; i < table->entry_count; ++i) {
         if (table->entries[i].nonterminal == nonterminal &&
@@ -82,6 +88,7 @@ const Rule* lookup_predict(const PredictTable* table, char nonterminal, char ter
     return NULL;
 }
 
+// 打印预测分析表
 void print_predict_table(const PredictTable* table) {
     printf("Predict Table:\n");
     for (int i = 0; i < table->entry_count; ++i) {

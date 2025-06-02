@@ -10,6 +10,9 @@
 #define MAX_SYMBOLS 64
 
 
+// lr0_parse_table.h - LR(0) 语法分析表头文件
+// 定义 LR(0) 分析表相关的数据结构和接口
+
 typedef enum {
     ACTION_NONE = 0,
     ACTION_SHIFT,

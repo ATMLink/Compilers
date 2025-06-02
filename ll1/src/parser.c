@@ -1,3 +1,6 @@
+// parser.c - LL(1) 语法分析器实现
+// 负责根据预测分析表和输入 token 流进行 LL(1) 语法分析
+
 #include "parser.h"
 #include "tree_node.h"
 #include <string.h>

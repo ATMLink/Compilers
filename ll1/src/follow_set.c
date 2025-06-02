@@ -1,7 +1,14 @@
+// follow_set.c - Follow 集合相关实现
+// 负责计算文法中各符号的 Follow 集合
+
 #include "follow_set.h"
-static void propagate_follow(Grammar* grammar, 
-                             SymbolSet* sets, 
-                             int* set_count, 
+
+// 传播 Follow 集合
+// 对于文法中的每一个产生式，检查其右侧符号
+// 如果是非终结符，则尝试将其后续符号的信息传播到该非终结符的 Follow 集合中
+static void propagate_follow(Grammar* grammar,
+                             SymbolSet* sets,
+                             int* set_count,
                              bool* changed,
                              Arena* arena)
 {
@@ -47,9 +54,12 @@ static void propagate_follow(Grammar* grammar,
     }
 }
 
-void compute_follow_sets(Grammar* grammar, 
-                         SymbolSet* sets, 
-                         int* set_count, 
+// 计算文法的 Follow 集合
+// 初始化文法的起始符号 S 的 Follow 集合为 {$}
+// 重复传播过程，直到没有变化为止
+void compute_follow_sets(Grammar* grammar,
+                         SymbolSet* sets,
+                         int* set_count,
                          Arena* arena)
 {
     SymbolSet* start = get_or_create_set(sets, set_count, 'S', arena);

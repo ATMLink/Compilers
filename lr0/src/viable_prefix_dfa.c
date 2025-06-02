@@ -1,3 +1,6 @@
+// viable_prefix_dfa.c - LR(0) 项集族 DFA 构造与管理实现
+// 负责根据文法构建活前缀 DFA，包括项集闭包、转移、状态查找、DFA 打印与释放等
+
 #include "viable_prefix_dfa.h"
 #include "grammar.h"
 
@@ -65,6 +68,7 @@ static int find_state(const DFA* dfa, const ItemSet* set) {
     return -1;
 }
 
+// 扩展项集的闭包
 static void closure(ItemSet* set, const Grammar* grammar, Arena* arena){
     uint8_t i = 0;
     while(i < set->item_count){
@@ -72,6 +76,7 @@ static void closure(ItemSet* set, const Grammar* grammar, Arena* arena){
         if(item->dot >= item->right_len) continue;
 
         char next_symbol = item->right_symbols[item->dot];
+        // 仅对非终结符进行闭包操作
         if(isupper(next_symbol)){
             for(int j = 0; j < grammar->rule_count; j++){
                 if(grammar->rules[j].left_hs == next_symbol){
@@ -82,13 +87,16 @@ static void closure(ItemSet* set, const Grammar* grammar, Arena* arena){
                         .dot = 0
                     };
                     int exists = 0;
+                    // 检查新生成的项是否已在项集中
                     for(uint8_t k = 0; k < set->item_count; k++){
                         if(item_equal(&set->items[k], &new_item)){
                             exists = 1;
                             break;
                         }
                     }
+                    // 若项集内不存在该项，则添加之
                     if (!exists) {
+                        // 扩容项集
                         if (set->item_count >= set->item_capacity) {
                             size_t new_capacity = set->item_capacity ? set->item_capacity * 2 : 8;
                             DFAItem* new_items = arena_alloc(arena, new_capacity * sizeof(DFAItem));
@@ -113,7 +121,9 @@ static void goto_set(const ItemSet* set, char symbol, const Grammar* grammar, It
     out->item_count = 0;
     for (uint8_t i = 0; i < set->item_count; i++) {
         const DFAItem* item = &set->items[i];
+        // 仅对项集中点位于符号处的项进行处理
         if (item->dot < item->right_len && item->right_symbols[item->dot] == symbol) {
+            // 扩容转移后的项集
             if (out->item_count >= out->item_capacity) {
                 size_t new_capacity = out->item_capacity ? out->item_capacity * 2 : 8;
                 DFAItem* new_items = arena_alloc(arena, new_capacity * sizeof(DFAItem));
@@ -121,6 +131,7 @@ static void goto_set(const ItemSet* set, char symbol, const Grammar* grammar, It
                 out->items = new_items;
                 out->item_capacity = new_capacity;
             }
+            // 将转移后的项添加到新项集中
             out->items[out->item_count++] = (DFAItem){
                 .left_symbol = item->left_symbol,
                 .right_symbols = item->right_symbols,
@@ -129,9 +140,11 @@ static void goto_set(const ItemSet* set, char symbol, const Grammar* grammar, It
             };
         }
     }
+    // 对转移后的项集进行闭包运算
     closure(out, grammar, arena);
 }
 
+// 构建 LR(0) 活前缀 DFA
 void build_viable_prefix_dfa(const Grammar* grammar, DFA* dfa, Arena* arena){
     if(!grammar || grammar->rule_count <= 0){
         fprintf(stderr, "Invalid or empty grammar.\n");
@@ -147,6 +160,7 @@ void build_viable_prefix_dfa(const Grammar* grammar, DFA* dfa, Arena* arena){
         fprintf(stderr, "Invalid start dfa item.\n");
         exit(EXIT_FAILURE);
     }
+    // 初始化起始项集
     start.items[0] = (DFAItem){
         .left_symbol = grammar->rules[0].left_hs,
         .right_symbols = grammar->rules[0].right_hs,
@@ -154,6 +168,7 @@ void build_viable_prefix_dfa(const Grammar* grammar, DFA* dfa, Arena* arena){
         .dot = 0
     };
     start.item_count = 1;
+    // 计算起始项集的闭包
     closure(&start, grammar, arena);
 
     dfa->state_capacity = 16;
@@ -170,21 +185,25 @@ void build_viable_prefix_dfa(const Grammar* grammar, DFA* dfa, Arena* arena){
         fprintf(stderr, "Invalid dfa transitions.\n");
         exit(EXIT_FAILURE);
     }
+    // 遍历 DFA 状态，计算各状态下的转移
     for (uint8_t i = 0; i < dfa->state_count; i++) {
         const ItemSet* current = &dfa->states[i];
         char seen_symbols[256] = {0};
 
         for (uint8_t j = 0; j < current->item_count; j++) {
             char sym = current->items[j].right_symbols[current->items[j].dot];
+            // 仅处理未处理过的符号
             if (sym && !seen_symbols[(unsigned char)sym]) {
                 seen_symbols[(unsigned char)sym] = 1;
 
                 ItemSet next = {0};
                 next.item_capacity = 8;
                 next.items = arena_alloc(arena, next.item_capacity * sizeof(DFAItem));
+                // 计算转移后的项集
                 goto_set(current, sym, grammar, &next, arena);
 
                 int existing = find_state(dfa, &next);
+                // 若转移后的项集对应的状态不存在，则新建状态
                 if (existing == -1) {
                     if (dfa->state_count >= dfa->state_capacity) {
                         size_t new_capacity = dfa->state_capacity * 2;
@@ -199,6 +218,7 @@ void build_viable_prefix_dfa(const Grammar* grammar, DFA* dfa, Arena* arena){
                     next.items = NULL;
                 }
 
+                // 扩容转移表
                 if (dfa->transition_count >= dfa->transition_capacity) {
                     size_t new_capacity = dfa->transition_capacity * 2;
                     Transition* new_transitions = arena_alloc(arena, new_capacity * sizeof(Transition));
@@ -206,6 +226,7 @@ void build_viable_prefix_dfa(const Grammar* grammar, DFA* dfa, Arena* arena){
                     dfa->transitions = new_transitions;
                     dfa->transition_capacity = new_capacity;
                 }
+                // 添加转移
                 dfa->transitions[dfa->transition_count++] = (Transition){
                     .from_state = i,
                     .symbol = sym,
@@ -217,6 +238,7 @@ void build_viable_prefix_dfa(const Grammar* grammar, DFA* dfa, Arena* arena){
 
 }
 
+// 释放 DFA 占用的内存
 void dfa_free(DFA* dfa){
     if (dfa && dfa->arena) {
         memset(dfa, 0, sizeof(DFA));

@@ -1,3 +1,6 @@
+// lr0_parse_table.c - LR(0) 语法分析表实现
+// 负责 LR(0) 分析表的构建和查询
+
 #include "lr0_parse_table.h"
 #include "viable_prefix_dfa.h"
 #include <stdio.h>
@@ -38,6 +41,14 @@ static int find_rule_index(const Grammar* grammar, const DFAItem* item) {
     return -1;
 }
 
+/**
+ * build_lr0_parse_table - 构建 LR(0) 语法分析表
+ * @grammar: 文法规则
+ * @dfa: 状态机
+ * @table: 解析表
+ *
+ * 该函数根据给定的文法和状态机构建 LR(0) 语法分析表。它填充动作表和 GOTO 表。
+ */
 void build_lr0_parse_table(const Grammar* grammar, const DFA* dfa, LR0ParseTable* table) {
     memset(table->action, ACTION_ERROR, sizeof(table->action));
     memset(table->go_to, -1, sizeof(table->go_to));
@@ -79,6 +90,15 @@ void build_lr0_parse_table(const Grammar* grammar, const DFA* dfa, LR0ParseTable
     }
 }
 
+/**
+ * print_lr0_parse_table - 打印 LR(0) 语法分析表
+ * @grammar: 文法规则
+ * @table: 解析表
+ * @dfa: 状态机
+ * @out: 输出文件指针
+ *
+ * 该函数将 LR(0) 语法分析表的内容打印到指定的输出文件。
+ */
 void print_lr0_parse_table(const Grammar* grammar, const LR0ParseTable* table, const DFA* dfa, FILE* out) {
     fprintf(out, "LR(0) ACTION Table:\n");
     fprintf(out, "State\t");

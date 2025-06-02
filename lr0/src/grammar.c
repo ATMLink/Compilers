@@ -1,3 +1,6 @@
+// grammar.c - LR(0) 文法处理实现
+// 负责文法的读取、符号收集、规则解析等核心逻辑
+
 #include "grammar.h"
 
 #include <stdio.h>

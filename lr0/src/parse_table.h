@@ -1,3 +1,6 @@
+// parse_table.h - 分析表头文件
+// 定义分析表相关的数据结构和接口
+
 #ifndef PARSE_TABLE_H
 #define PARSE_TABLE_H
 

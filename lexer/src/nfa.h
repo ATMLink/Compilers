@@ -1,4 +1,6 @@
-// nfa.h
+// nfa.h - 非确定性有限自动机（NFA）头文件
+// 定义 NFA 相关的数据结构和接口
+
 #ifndef NFA_H
 #define NFA_H
 

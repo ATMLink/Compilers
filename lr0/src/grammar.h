@@ -16,6 +16,9 @@
 #define GRAMMAR_DEBUG(fmt, ...) ((void)0)
 #endif
 
+// grammar.h - LR(0) 文法头文件
+// 定义文法规则、错误码、结果类型和相关接口
+
 typedef struct Rule
 {
     char left_hs;   //产生式左边的非终结符

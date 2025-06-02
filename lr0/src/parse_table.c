@@ -1,3 +1,6 @@
+// parse_table.c - 通用分析表实现
+// 负责分析表的构建和查询
+
 #include "parse_table.h"
 #include "parse_utils.h"
 #include <string.h>

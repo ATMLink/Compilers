@@ -1,3 +1,6 @@
+// ast_builder.c - 抽象语法树（AST）构建实现
+// 负责将 CST 转换为 AST
+
 #include "ast_builder.h"
 #include <stdlib.h>
 #include <stdio.h>

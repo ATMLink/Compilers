@@ -1,3 +1,6 @@
+// first_set.c - First 集合相关实现
+// 负责计算文法中各符号的 First 集合
+
 #include "first_set.h"
 
 static void process_right_symbol_first(char* rhs, 
@@ -35,6 +38,16 @@ static void process_right_symbol_first(char* rhs,
         if(add_char(lhs_set->first, '#')) *changed = true;
     }
 }
+
+/**
+ * compute_first_sets - 计算文法中各符号的 First 集合
+ * @grammar: 文法规则
+ * @sets: 符号集合
+ * @set_count: 集合数量
+ * @arena: 内存池
+ * 
+ * 遍历文法中的每条规则，处理其右部符号以计算 First 集合。
+ */
 void compute_first_sets(Grammar* grammar, 
                         SymbolSet* sets, 
                         int* set_count, 

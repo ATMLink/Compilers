@@ -5,6 +5,9 @@
 #include "arena.h"
 #include "matcher.h"
 
+// dfa.h - 确定性有限自动机（DFA）相关结构与接口声明
+// 用于词法分析器的自动机状态转换与模拟
+
 #define MAX_DFA_STATES 256
 #define MAX_ALPHABET 256 // 假设 ASCII 字符集
 

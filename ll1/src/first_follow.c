@@ -1,3 +1,6 @@
+// first_follow.c - First/Follow 集合相关实现
+// 负责符号集的查找、创建和字符集操作
+
 #include "first_follow.h"
 #include "grammar.h"
 
