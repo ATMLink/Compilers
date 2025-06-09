@@ -253,6 +253,9 @@ GrammarResultGrammar read_grammar(const char* filename, Arena* arena) {
             return (GrammarResultGrammar){ .status = line_res.status };
         }
     }
+    
+    // +++ 新增：确保输入结束符 '#' 在终结符列表中 +++
+    grammar_add_unique_symbol(grammar->terminals, &grammar->terminals_count, '#');
 
     fclose(file);
     GRAMMAR_DEBUG("Finished reading grammar file.");
