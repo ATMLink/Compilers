@@ -47,7 +47,7 @@ const char** tokenize(const char* input, int* token_count) {
     
     for (const char* p = input; *p && *token_count < MAX_TOKENS; p++) {
         if (isspace(*p)) continue; // Skip whitespace
-        if (*p == 'c' || *p == 'd' || *p == 'b') { // Valid terminals from grammar
+        if (*p == 'c' || *p == 'd' || *p == 'b' || *p == '+') { // Valid terminals from grammar
             char* token = malloc(2);
             token[0] = *p;
             token[1] = '\0';
